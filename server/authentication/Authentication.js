@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -32,4 +33,29 @@ const isOpenPathAndMethod = (req) => {
     return openMethods.find((e) => e.path === path && e.method === method);
 };
 
-module.exports = { verifyToken, openMethod };
+function signToken(user) {
+    return jwt.sign(
+        { user_id: user._id, username: user.username },
+        process.env.TOKEN_KEY,
+        {
+            expiresIn: '5h',
+            issuer: 'Server'
+        }
+    );
+}
+
+const hashPassword = async (password) => {
+    return await bcrypt.hash(password, 10);
+};
+
+const comparePasswords = async (providedPassword, actualPassword) => {
+    return await bcrypt.compare(providedPassword, actualPassword);
+};
+
+module.exports = {
+    verifyToken,
+    openMethod,
+    hashPassword,
+    signToken,
+    comparePasswords
+};

@@ -1,22 +1,14 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-dotenv.config();
+
 const router = express.Router();
 
 const userDB = require('../models/UserModel');
-
-function signToken(user) {
-    return jwt.sign(
-        { user_id: user._id, username: user.username },
-        process.env.TOKEN_KEY,
-        {
-            expiresIn: '5h',
-            issuer: 'Server'
-        }
-    );
-}
+const {
+    hashPassword,
+    signToken,
+    comparePasswords
+} = require('../authentication/Authentication');
 
 router
     .route('/')
@@ -32,7 +24,7 @@ router
             if (oldUser) {
                 return res.status(409).send('User already exists');
             }
-            let encryptedPwd = await bcrypt.hash(password, 10);
+            let encryptedPwd = await hashPassword(password);
             const user = await userDB.create({
                 username,
                 password: encryptedPwd,
@@ -48,9 +40,22 @@ router
         }
     })
     .put(async (req, res) => {
-        const username = req.body.username;
+        const currentUsername = req.user.username;
+        const { username, password, photoURL, bio } = req.body;
+        let encryptedPwd = await hashPassword(password);
         await userDB
-            .findOneAndUpdate({ username }, req.body)
+            .findOneAndUpdate(
+                { username: currentUsername },
+                {
+                    username,
+                    password: encryptedPwd,
+                    photoURL,
+                    bio
+                },
+                {
+                    new: true
+                }
+            )
             .select('-password')
             .then((data) => {
                 res.status(200).json(data);
@@ -81,7 +86,7 @@ router.post('/login', async (req, res) => {
             res.status(400).send('Required input was not set');
         } else {
             const user = await userDB.findOne({ username }).exec();
-            if (user && (await bcrypt.compare(password, user.password))) {
+            if (user && (await comparePasswords(password, user.password))) {
                 const token = signToken(user);
                 user.token = token;
                 user.password = undefined;
@@ -91,15 +96,84 @@ router.post('/login', async (req, res) => {
             }
         }
     } catch (err) {
-        res.status(400).send('Server error when authenticating');
+        res.status(500).send('Server error when authenticating');
     }
 });
 
-router.post('/request/send', (req, res) => {
-    res.send('send');
+router.post('/request/send', async (req, res) => {
+    const userId = req.user.user_id;
+    const potentialNewFriend = req.body.username;
+    await userDB
+        .findOneAndUpdate(
+            {
+                username: potentialNewFriend,
+                friends: { $not: { $elemMatch: { $eq: userId } } }
+            },
+            { $addToSet: { requests: userId } },
+            { new: true }
+        )
+        .then((data) => {
+            res.status(200).send('Friend request sent succesfully');
+        })
+        .catch((err) => {
+            res.status(500).send('Could not send friend request');
+        });
 });
-router.post('/request/respond', (req, res) => {
-    res.send(req.body.response);
+router.post('/request/respond', async (req, res) => {
+    const action = req.body.response;
+    const targetUser = req.body.user_id;
+    switch (action) {
+        case 'accept':
+            await userDB
+                .findOneAndUpdate(
+                    {
+                        username: req.user.username,
+                        requests: targetUser
+                    },
+                    {
+                        $pull: { requests: targetUser },
+                        $push: { friends: targetUser }
+                    },
+                    { new: true }
+                )
+                .then(async (data) => {
+                    const currentUserId = data._id;
+                    await userDB.findOneAndUpdate(
+                        { _id: targetUser },
+                        {
+                            $pull: { requests: currentUserId },
+                            $push: { friends: currentUserId }
+                        },
+                        { new: true }
+                    );
+                    res.status(200).send('Friend request accepted');
+                })
+                .catch((err) => {
+                    res.status(500).send(
+                        'Error while accepting friend request'
+                    );
+                });
+            break;
+        case 'reject':
+            await userDB
+                .findOneAndUpdate(
+                    { username: req.user.username },
+                    { $pull: { requests: targetUser } },
+                    { new: true }
+                )
+                .then((data) => {
+                    res.status(200).send('Friend request rejected');
+                })
+                .catch((err) => {
+                    res.status(500).send(
+                        'Error while rejecting friend request'
+                    );
+                });
+            break;
+        default:
+            res.status(400).send('"response" must be "accept" or "reject"');
+            break;
+    }
 });
 
 module.exports = router;
