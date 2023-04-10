@@ -7,7 +7,7 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 const app = express();
-const db = require('./db');
+const db = require('./database/db');
 const router = require('./routes');
 
 // middleware
