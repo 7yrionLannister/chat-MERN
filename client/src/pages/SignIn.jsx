@@ -1,6 +1,5 @@
 import {
     Container,
-    TextField,
     Box,
     Grid,
     Avatar,
@@ -12,6 +11,8 @@ import {
     Paper
 } from '@mui/material';
 import { LockOutlined } from '@mui/icons-material';
+import { Password } from '../components/Password';
+import { ValidatedField } from '../components/ValidatedField';
 
 export function SignIn() {
     const handleSubmit = (event) => {
@@ -31,44 +32,32 @@ export function SignIn() {
                     display='flex'
                     flexDirection='column'
                     alignItems='center'
-                    bgcolor='#edf5f3'
                 >
                     <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                         <LockOutlined />
                     </Avatar>
-                    <Typography
-                        component='h1'
-                        variant='h5'
-                    >
-                        Sign In
-                    </Typography>
+                    <Typography variant='h5'>Sign In</Typography>
                     <Box
                         mt={1}
                         component='form'
                         noValidate
                         onSubmit={handleSubmit}
                     >
-                        <TextField
+                        <ValidatedField
                             margin='normal'
                             fullWidth
                             required
                             label='Username'
-                            helperText='At least 4 characters long'
+                            isValid={(value) => value.length >= 4}
+                            errorMessage='At least 4 characters long'
                         />
-                        <TextField
+                        <Password
                             margin='normal'
                             fullWidth
                             required
-                            type='password'
-                            label='Password'
                         />
                         <FormControlLabel
-                            control={
-                                <Checkbox
-                                    value='remember'
-                                    color='primary'
-                                />
-                            }
+                            control={<Checkbox value='remember' />}
                             label='Remember me'
                         />
                         <Button
