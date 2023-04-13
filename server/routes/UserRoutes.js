@@ -72,18 +72,16 @@ router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         if (!(username && password)) {
-            res.status(400).send('Required input was not set');
-        } else {
-            const user = await userDB.findOne({ username }).exec();
-            if (user && (await comparePasswords(password, user.password))) {
-                const token = signToken(user);
-                user.token = token;
-                user.password = undefined;
-                res.status(200).json(user);
-            } else {
-                res.status(401).send('Invalid credentials');
-            }
+            return res.status(400).send('Required input was not set');
         }
+        const user = await userDB.findOne({ username }).exec();
+        if (user && (await comparePasswords(password, user.password))) {
+            const token = signToken(user);
+            user.token = token;
+            user.password = undefined;
+            return res.status(200).json(user);
+        }
+        res.status(401).send('Invalid credentials');
     } catch (err) {
         res.status(500).send('Server error when authenticating');
     }

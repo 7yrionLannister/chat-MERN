@@ -1,0 +1,24 @@
+[
+    {
+        "_id": "64320947a460a0c1e25f26c0",
+        "username": "user1",
+        "photoURL": "https://media.licdn.com/dms/image/D4E03AQFkO6jaMNJi0Q/profile-displayphoto-shrink_200_200/0/1675456311004?e=1686787200&v=beta&t=UrYiEDH1eVNSzA_ClaXZZPCeQzNEZqDgtvy2WkRBaDM",
+        "friends": [
+            "64320fa672e5e099dd1994e5"
+        ],
+        "requests": [],
+        "bio": "bio1",
+        "__v": 0
+    },
+    {
+        "_id": "64320fa672e5e099dd1994e5",
+        "username": "user2",
+        "photoURL": "https://avatars.githubusercontent.com/u/47828494?v=4",
+        "friends": [
+            "64320947a460a0c1e25f26c0"
+        ],
+        "requests": [],
+        "bio": "bio2",
+        "__v": 0
+    }
+]
