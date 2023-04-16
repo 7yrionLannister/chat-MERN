@@ -1,9 +1,10 @@
-import { useSelector } from 'react-redux';
-import { selectUser } from './lib/redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, selectUser } from './lib/redux/userSlice';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Home } from './pages/Home';
 import { SignIn } from './pages/SignIn';
 import { createTheme, ThemeProvider } from '@mui/material';
+import { useEffect } from 'react';
 
 const theme = createTheme({
     palette: {
@@ -19,11 +20,17 @@ const theme = createTheme({
 
 function App() {
     const user = useSelector(selectUser);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const u = localStorage.getItem('user');
+        if (u) dispatch(login(JSON.parse(u)));
+    }, [dispatch]);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            {user ? <Home /> : <SignIn />}
+            {Object.keys(user).length > 0 ? <Home /> : <SignIn />}
         </ThemeProvider>
     );
 }

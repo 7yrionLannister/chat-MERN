@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
+import constants from '../data/constants.json';
 
-export function useFetch(url) {
+export function useFetch({
+    url = constants.path,
+    method = 'GET',
+    body = undefined
+}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -11,7 +16,10 @@ export function useFetch(url) {
         const abortController = new AbortController();
         setController(abortController);
         setLoading(true);
-        fetch(url, { signal: abortController.signal })
+        fetch(
+            { method, url, body: JSON.stringify(body) },
+            { signal: abortController.signal }
+        )
             .then((response) => response.json())
             .then((data) => setData(data))
             .catch((err) => {

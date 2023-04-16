@@ -18,7 +18,7 @@ export function Password({ label = 'Password', ...props }) {
                     </IconButton>
                 )
             }}
-            errorMessage='Password must be at least 8 characters long, contain both uppercase and lowercase letters, and a special character'
+            errorMessage='Password must be at least 8 characters long, contain both uppercase and lowercase letters, digits and special characters'
             isValid={(value) =>
                 /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])(?=.{8,})/.test(
                     value
