@@ -1,81 +1,125 @@
 import {
-    Container,
-    TextField,
     Box,
+    Button,
+    Checkbox,
+    FormControlLabel,
     Grid,
-    Avatar,
-    Typography,
-    Link
+    Link,
+    TextField
 } from '@mui/material';
-import { LockOutlined } from '@mui/icons-material';
+import { Form } from '../components/Form';
+import { ValidatedField } from '../components/ValidatedField';
+import { Password } from '../components/Password';
+import { ResponseAlert } from '../components/ResponseAlert';
+import { signupApi } from '../services/api';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { login } from '../lib/redux/userSlice';
+import { AuthenticationFormTitle } from '../components/AuthenticationFormTitle';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 export function SignUp() {
-    const handleSubmit = (event) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [photoURL, setPhotoURL] = useState('');
+    const [bio, setBio] = useState('');
+    const [response, setResponse] = useState(null);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log(data);
+        let res = await signupApi(username, password, photoURL, bio);
+        if (res.status === 201) {
+            dispatch(login({ username, password }));
+            localStorage.setItem('user', JSON.stringify(res.data));
+            navigate('/');
+        } else {
+            setResponse(res);
+        }
     };
+
     return (
-        <Container
-            component='main'
-            sx={{ bgcolor: '#f0f0f0' }}
-            maxWidth='sm'
+        <Form
+            handleSubmit={handleSubmit}
+            title={<AuthenticationFormTitle title='Sign Up' />}
         >
-            <Box
-                borderRadius={3}
-                mt={8}
-                py={3}
-                display='flex'
-                flexDirection='column'
-                alignItems='center'
-                bgcolor='#afafaf'
+            <ResponseAlert
+                response={response}
+                onClick={() => setResponse(null)}
+                errorMessage={response?.data}
+            />
+            <Grid
+                container
+                spacing={2}
             >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <LockOutlined />
-                </Avatar>
-                <Typography
-                    component='h1'
-                    variant='h5'
+                <Grid
+                    item
+                    xs
                 >
-                    Sign Up
-                </Typography>
-                <Box
-                    component='form'
-                    noValidate
-                    onSubmit={handleSubmit}
-                    mt={3}
+                    <ValidatedField
+                        margin='normal'
+                        required
+                        label='Username'
+                        isValid={(value) => value.length >= 4}
+                        errorMessage='At least 4 characters long'
+                        onChange={(event) => setUsername(event.target.value)}
+                        name='username'
+                    />
+                </Grid>
+                <Grid
+                    item
+                    xs
                 >
-                    <Grid
-                        container
-                        spacing={2}
-                    >
-                        <Grid item>
-                            <TextField
-                                required
-                                label='Username'
-                                helperText='At least 4 characters long'
-                            />
-                        </Grid>
-                        <Grid item>
-                            <TextField
-                                required
-                                type='password'
-                                label='Password'
-                            />
-                        </Grid>
-                    </Grid>
-                </Box>
-                <Link
-                    dir='dir'
-                    rel='rel'
-                    resource='res'
-                    href='#'
-                >
-                    <Typography variant='caption'>
-                        Don't have an account? Sign Up
-                    </Typography>
-                </Link>
-            </Box>
-        </Container>
+                    <Password
+                        margin='normal'
+                        required
+                        onChange={(event) => setPassword(event.target.value)}
+                        name='password'
+                    />
+                </Grid>
+            </Grid>
+            <TextField
+                type='url'
+                margin='normal'
+                fullWidth
+                label='Photo URL'
+                onChange={(event) => setPhotoURL(event.target.value)}
+                name='photoURL'
+            />
+            <Box
+                component='img'
+                width='100%'
+                src={photoURL}
+                alt='Profile picture'
+            />
+            <TextField
+                rows={3}
+                margin='normal'
+                fullWidth
+                label='Bio'
+                onChange={(event) => setBio(event.target.value)}
+                name='bio'
+            />
+            <FormControlLabel
+                control={<Checkbox value='remember' />}
+                label='Remember me'
+            />
+            <Button
+                type='submit'
+                fullWidth
+                variant='contained'
+                sx={{ mt: 3, mb: 2 }}
+            >
+                Sign Up
+            </Button>
+            <Link
+                variant='body2'
+                component={RouterLink}
+                to='/'
+            >
+                Already have an account? Sign In
+            </Link>
+        </Form>
     );
 }

@@ -8,7 +8,7 @@ export function Form({ children, title, handleSubmit }) {
         >
             <Paper elevation={8}>
                 <Box
-                    mt={8}
+                    my={8}
                     p={2}
                     display='flex'
                     flexDirection='column'

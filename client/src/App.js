@@ -6,6 +6,8 @@ import { SignIn } from './pages/SignIn';
 import { createTheme, ThemeProvider } from '@mui/material';
 import { useEffect } from 'react';
 import { decodeJwt } from 'jose';
+import { Route, Routes } from 'react-router-dom';
+import { SignUp } from './pages/SignUp';
 
 const theme = createTheme({
     palette: {
@@ -37,7 +39,20 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            {user?.username ? <Home /> : <SignIn />}
+            {user?.username ? (
+                <Home />
+            ) : (
+                <Routes>
+                    <Route
+                        path='/'
+                        element={<SignIn />}
+                    />
+                    <Route
+                        path='/signup'
+                        element={<SignUp />}
+                    />
+                </Routes>
+            )}
         </ThemeProvider>
     );
 }

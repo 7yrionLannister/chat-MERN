@@ -8,6 +8,7 @@ import { login } from '../lib/redux/userSlice';
 import { Form } from '../components/Form';
 import { ResponseAlert } from '../components/ResponseAlert';
 import { AuthenticationFormTitle } from '../components/AuthenticationFormTitle';
+import { Link as RouterLink } from 'react-router-dom';
 
 export function SignIn() {
     const [username, setUsername] = useState('');
@@ -80,8 +81,9 @@ export function SignIn() {
                 </Grid>
                 <Grid item>
                     <Link
-                        href='#'
+                        component={RouterLink}
                         variant='body2'
+                        to='/signup'
                     >
                         Don't have an account? Sign Up
                     </Link>

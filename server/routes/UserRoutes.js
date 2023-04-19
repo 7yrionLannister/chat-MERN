@@ -21,6 +21,17 @@ router
             if (oldUser) {
                 return res.status(409).send('User already exists');
             }
+            if (
+                !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])(?=.{8,})/.test(
+                    password
+                )
+            ) {
+                return res
+                    .status(400)
+                    .send(
+                        'Provide a strong password (uppercase and lowercase letters, digits and special characters)'
+                    );
+            }
             let encryptedPwd = await hashPassword(password);
             const user = await userDB.create({
                 username,
