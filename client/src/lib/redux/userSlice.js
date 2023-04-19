@@ -15,7 +15,7 @@ export const userSlice = createSlice({
             state.bio = bio;
             state.token = token;
         },
-        logout: () => {}
+        logout: () => ({})
     }
 });
 

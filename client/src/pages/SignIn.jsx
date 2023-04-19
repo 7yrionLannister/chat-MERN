@@ -1,25 +1,13 @@
-import {
-    Container,
-    Box,
-    Grid,
-    Avatar,
-    Typography,
-    Link,
-    Button,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Backdrop,
-    Alert,
-    AlertTitle
-} from '@mui/material';
-import { LockOutlined } from '@mui/icons-material';
+import { Grid, Link, Button, FormControlLabel, Checkbox } from '@mui/material';
 import { Password } from '../components/Password';
 import { ValidatedField } from '../components/ValidatedField';
 import { useState } from 'react';
 import { loginApi } from '../services/api';
 import { useDispatch } from 'react-redux';
 import { login } from '../lib/redux/userSlice';
+import { Form } from '../components/Form';
+import { ResponseAlert } from '../components/ResponseAlert';
+import { AuthenticationFormTitle } from '../components/AuthenticationFormTitle';
 
 export function SignIn() {
     const [username, setUsername] = useState('');
@@ -29,114 +17,76 @@ export function SignIn() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(username, password);
 
         let res = await loginApi(username, password);
-        if (res.status === 200) dispatch(login({ username, password }));
-        setResponse(res);
+        if (res.status === 200) {
+            dispatch(login({ username, password }));
+            localStorage.setItem('user', JSON.stringify(res.data));
+        } else {
+            setResponse(res);
+        }
     };
 
     return (
-        <Container
-            component='main'
-            maxWidth='xs'
+        <Form
+            handleSubmit={handleSubmit}
+            title={<AuthenticationFormTitle title='Sign In' />}
         >
-            <Paper elevation={8}>
-                <Box
-                    mt={8}
-                    p={2}
-                    display='flex'
-                    flexDirection='column'
-                    alignItems='center'
+            <ResponseAlert
+                response={response}
+                onClick={() => setResponse(null)}
+                errorMessage={response?.data}
+            />
+            <ValidatedField
+                margin='normal'
+                fullWidth
+                required
+                label='Username'
+                isValid={(value) => value.length >= 4}
+                errorMessage='At least 4 characters long'
+                onChange={(event) => setUsername(event.target.value)}
+                name='username'
+            />
+            <Password
+                margin='normal'
+                fullWidth
+                required
+                onChange={(event) => setPassword(event.target.value)}
+                name='password'
+            />
+            <FormControlLabel
+                control={<Checkbox value='remember' />}
+                label='Remember me'
+            />
+            <Button
+                type='submit'
+                fullWidth
+                variant='contained'
+                sx={{ mt: 3, mb: 2 }}
+            >
+                Sign In
+            </Button>
+            <Grid container>
+                <Grid
+                    item
+                    xs
                 >
-                    <Backdrop
-                        open={response != null}
-                        sx={{
-                            color: '#fff',
-                            zIndex: (theme) => theme.zIndex.drawer + 1
-                        }}
-                        onClick={() => setResponse(null)}
+                    <Link
+                        href='#'
+                        variant='body2'
                     >
-                        <Alert
-                            severity={
-                                response?.status === 200 ? 'success' : 'info'
-                            }
-                        >
-                            <AlertTitle>
-                                {response?.status + ' ' + response?.statusText}
-                            </AlertTitle>
-                            {response?.status === 200
-                                ? 'Succesfully logged in'
-                                : response?.data}
-                        </Alert>
-                    </Backdrop>
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlined />
-                    </Avatar>
-                    <Typography variant='h5'>Sign In</Typography>
-                    <Box
-                        mt={1}
-                        component='form'
-                        noValidate
-                        onSubmit={handleSubmit}
+                        Forgot password?
+                    </Link>
+                </Grid>
+                <Grid item>
+                    <Link
+                        href='#'
+                        variant='body2'
                     >
-                        <ValidatedField
-                            margin='normal'
-                            fullWidth
-                            required
-                            label='Username'
-                            isValid={(value) => value.length >= 4}
-                            errorMessage='At least 4 characters long'
-                            onChange={(event) =>
-                                setUsername(event.target.value)
-                            }
-                            name='username'
-                        />
-                        <Password
-                            margin='normal'
-                            fullWidth
-                            required
-                            onChange={(event) =>
-                                setPassword(event.target.value)
-                            }
-                            name='password'
-                        />
-                        <FormControlLabel
-                            control={<Checkbox value='remember' />}
-                            label='Remember me'
-                        />
-                        <Button
-                            type='submit'
-                            fullWidth
-                            variant='contained'
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Sign In
-                        </Button>
-                        <Grid container>
-                            <Grid
-                                item
-                                xs
-                            >
-                                <Link
-                                    href='#'
-                                    variant='body2'
-                                >
-                                    Forgot password?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link
-                                    href='#'
-                                    variant='body2'
-                                >
-                                    Don't have an account? Sign Up
-                                </Link>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Paper>
-        </Container>
+                        Don't have an account? Sign Up
+                    </Link>
+                </Grid>
+            </Grid>
+        </Form>
     );
 }
