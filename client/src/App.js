@@ -39,20 +39,16 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            {user?.username ? (
-                <Home />
-            ) : (
-                <Routes>
-                    <Route
-                        path='/'
-                        element={<SignIn />}
-                    />
-                    <Route
-                        path='/signup'
-                        element={<SignUp />}
-                    />
-                </Routes>
-            )}
+            <Routes>
+                <Route
+                    path='/'
+                    element={user ? <Home /> : <SignIn />}
+                />
+                <Route
+                    path='/signup'
+                    element={<SignUp />}
+                />
+            </Routes>
         </ThemeProvider>
     );
 }

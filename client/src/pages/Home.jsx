@@ -1,28 +1,36 @@
-import { useSelector } from 'react-redux';
-import { selectUser } from '../lib/redux/userSlice';
-import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectUser } from '../lib/redux/userSlice';
+import { useState } from 'react';
 import { ChatsDrawer } from '../components/ChatsDrawer';
-import { getUsers } from '../services/api';
-import { ChatView } from '../components/ChatView';
+import { ChatView } from './ChatView';
+import {
+    Avatar,
+    Button,
+    Menu,
+    MenuItem,
+    Toolbar,
+    Typography
+} from '@mui/material';
 
-const drawerWidth = 240;
+const drawerWidth = 400;
 
 export const Home = () => {
     const user = useSelector(selectUser);
-    const [friends, setFriends] = useState([]);
-    const [currentFriend, setCurrentFriend] = useState({});
+    const [currentFriend, setCurrentFriend] = useState(null);
+    const [openAvatarMenu, setOpenAvatarMenu] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const dispatch = useDispatch();
 
-    useEffect(() => {
-        user?.friends.forEach((friend) =>
-            getUsers(user.token, { user_id: friend }).then((res) =>
-                setFriends((frs) => [...frs, res.data])
-            )
-        );
-    }, [user]);
+    const handleLogout = () => {
+        setOpenAvatarMenu(false);
+        localStorage.removeItem('user');
+        dispatch(logout());
+    };
 
-    useEffect(() => {
-        setCurrentFriend(friends[0]);
-    }, [friends]);
+    const handleUserAvatarClick = (event) => {
+        setAnchorEl(event.currentTarget);
+        setOpenAvatarMenu(true);
+    };
 
     return (
         <>
@@ -33,12 +41,40 @@ export const Home = () => {
                     receiver={currentFriend}
                 />
             )}
-            {/* TODO fetch users */}
             <ChatsDrawer
-                user={user}
                 width={drawerWidth}
-                friends={friends}
-            />
+                onFriendClick={(friend) => setCurrentFriend(friend)}
+            >
+                <Toolbar
+                    sx={{
+                        position: 'sticky',
+                        bgcolor: 'primary.main',
+                        width: drawerWidth
+                    }}
+                >
+                    <Button onClick={handleUserAvatarClick}>
+                        <Avatar src={user.photoURL} />
+                    </Button>
+                    <Typography
+                        variant='h6'
+                        color='#fff'
+                    >
+                        {user.username}
+                    </Typography>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={openAvatarMenu}
+                        onClose={() => setOpenAvatarMenu(false)}
+                        MenuListProps={{
+                            'aria-labelledby': 'basic-button'
+                        }}
+                    >
+                        <MenuItem>Profile</MenuItem>
+                        <MenuItem>My account</MenuItem>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                    </Menu>
+                </Toolbar>
+            </ChatsDrawer>
         </>
     );
 };

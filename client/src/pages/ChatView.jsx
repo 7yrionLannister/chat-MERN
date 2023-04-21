@@ -9,7 +9,7 @@ export function ChatView({ sender, receiver, drawerWidth }) {
     return (
         <>
             <AppBar
-                position='fixed'
+                position='sticky'
                 sx={styleRightToDrawer}
             >
                 <Toolbar>
@@ -30,8 +30,8 @@ export function ChatView({ sender, receiver, drawerWidth }) {
                 bgcolor='cyan'
                 sx={styleRightToDrawer}
             >
-                <h5>H5</h5>
-                <p>Paragraph</p>
+                <h5>{sender.username}</h5>
+                <p>{receiver.username}</p>
             </Box>
         </>
     );

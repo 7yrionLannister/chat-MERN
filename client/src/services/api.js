@@ -16,7 +16,7 @@ export const signupApi = async (username, password, photoURL, bio) => {
     return response;
 };
 
-export const getUsers = async (token, { user_id, username }) => {
+export const getUsers = async (token, user_id, username) => {
     let response = null;
     let query = '?';
     if (user_id) query += 'user_id=' + user_id;
