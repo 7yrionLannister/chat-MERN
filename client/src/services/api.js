@@ -1,4 +1,4 @@
-import { postRequest } from '../lib/axios';
+import { getRequest, postRequest } from '../lib/axios';
 
 export const loginApi = async (username, password) => {
     let response = null;
@@ -11,6 +11,17 @@ export const loginApi = async (username, password) => {
 export const signupApi = async (username, password, photoURL, bio) => {
     let response = null;
     await postRequest('/users', { username, password, photoURL, bio })
+        .then((data) => (response = data))
+        .catch((err) => (response = err.response));
+    return response;
+};
+
+export const getUsers = async (token, { user_id, username }) => {
+    let response = null;
+    let query = '?';
+    if (user_id) query += 'user_id=' + user_id;
+    else if (username) query += 'username=' + username;
+    await getRequest('/users' + query, token)
         .then((data) => (response = data))
         .catch((err) => (response = err.response));
     return response;

@@ -72,8 +72,9 @@ router
             ? { username }
             : { _id: { $ne: req.user.user_id } };
         if (user_id) filter = { _id: user_id };
-        await userDB
-            .find(filter)
+        let query =
+            user_id || username ? userDB.findOne(filter) : userDB.find(filter);
+        await query
             .select('-password')
             .then((data) => res.status(200).json(data))
             .catch(() => res.status(500).send('Error getting users'));
