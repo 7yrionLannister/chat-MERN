@@ -8,13 +8,13 @@ export const userSlice = createSlice({
             const { _id, username, photoURL, friends, requests, bio, token } =
                 action.payload;
             return {
-                user_id: _id,
-                username: username,
-                photoURL: photoURL,
-                friends: friends,
-                requests: requests,
-                bio: bio,
-                token: token
+                _id,
+                username,
+                photoURL,
+                friends,
+                requests,
+                bio,
+                token
             };
         },
         logout: () => null

@@ -21,8 +21,19 @@ export function SignIn() {
 
         let res = await loginApi(username, password);
         if (res.status === 200) {
-            dispatch(login({ username, password }));
-            localStorage.setItem('user', JSON.stringify(res.data));
+            const { _id, username, photoURL, friends, requests, bio, token } =
+                res.data;
+            const payload = {
+                _id,
+                username,
+                photoURL,
+                friends,
+                requests,
+                bio,
+                token
+            };
+            dispatch(login(payload));
+            localStorage.setItem('user', JSON.stringify(payload));
         } else {
             setResponse(res);
         }

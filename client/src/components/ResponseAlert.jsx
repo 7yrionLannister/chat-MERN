@@ -1,14 +1,14 @@
 import { Alert, AlertTitle, Backdrop } from '@mui/material';
 
-export function ResponseAlert({ response, onClick, errorMessage }) {
+export function ResponseAlert({ response, errorMessage, ...props }) {
     return (
         <Backdrop
+            {...props}
             open={response != null}
             sx={{
                 color: '#fff',
                 zIndex: (theme) => theme.zIndex.drawer + 1
             }}
-            onClick={onClick}
         >
             <Alert severity='error'>
                 <AlertTitle>
