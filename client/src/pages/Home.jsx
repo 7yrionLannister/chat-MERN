@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { selectUser } from '../lib/redux/userSlice';
 import { useState } from 'react';
-import { ChatsDrawer } from '../components/ChatsDrawer';
+import { ChatsDrawer } from '../components/drawer/ChatsDrawer';
 import { ChatView } from './ChatView';
 
 const drawerWidth = 400;

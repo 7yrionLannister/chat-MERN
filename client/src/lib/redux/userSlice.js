@@ -4,15 +4,12 @@ export const userSlice = createSlice({
     name: 'user',
     initialState: null,
     reducers: {
-        login: (state, action) => {
-            const { _id, username, photoURL, friends, requests, bio, token } =
-                action.payload;
+        login: (_state, action) => {
+            const { _id, username, photoURL, bio, token } = action.payload;
             return {
                 _id,
                 username,
                 photoURL,
-                friends,
-                requests,
                 bio,
                 token
             };

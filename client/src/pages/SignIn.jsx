@@ -1,13 +1,13 @@
 import { Grid, Link, Button, FormControlLabel, Checkbox } from '@mui/material';
-import { Password } from '../components/Password';
-import { ValidatedField } from '../components/ValidatedField';
+import { Password } from '../components/generic/Password';
+import { Form } from '../components/generic/Form';
+import { ResponseAlert } from '../components/generic/ResponseAlert';
+import { AuthenticationFormTitle } from '../components/generic/AuthenticationFormTitle';
+import { ValidatedField } from '../components/generic/ValidatedField';
 import { useState } from 'react';
 import { loginApi } from '../services/api';
 import { useDispatch } from 'react-redux';
 import { login } from '../lib/redux/userSlice';
-import { Form } from '../components/Form';
-import { ResponseAlert } from '../components/ResponseAlert';
-import { AuthenticationFormTitle } from '../components/AuthenticationFormTitle';
 import { Link as RouterLink } from 'react-router-dom';
 
 export function SignIn() {
@@ -21,14 +21,11 @@ export function SignIn() {
 
         let res = await loginApi(username, password);
         if (res.status === 200) {
-            const { _id, username, photoURL, friends, requests, bio, token } =
-                res.data;
+            const { _id, username, photoURL, bio, token } = res.data;
             const payload = {
                 _id,
                 username,
                 photoURL,
-                friends,
-                requests,
                 bio,
                 token
             };

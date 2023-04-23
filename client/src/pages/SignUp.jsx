@@ -7,15 +7,15 @@ import {
     Link,
     TextField
 } from '@mui/material';
-import { Form } from '../components/Form';
-import { ValidatedField } from '../components/ValidatedField';
-import { Password } from '../components/Password';
-import { ResponseAlert } from '../components/ResponseAlert';
+import { Form } from '../components/generic/Form';
+import { ValidatedField } from '../components/generic/ValidatedField';
+import { Password } from '../components/generic/Password';
+import { ResponseAlert } from '../components/generic/ResponseAlert';
+import { AuthenticationFormTitle } from '../components/generic/AuthenticationFormTitle';
 import { signupApi } from '../services/api';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../lib/redux/userSlice';
-import { AuthenticationFormTitle } from '../components/AuthenticationFormTitle';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 export function SignUp() {

@@ -26,3 +26,19 @@ export const getUsers = async (token, user_id, username) => {
         .catch((err) => (response = err.response));
     return response;
 };
+
+export const sendFriendRequest = async (token, username) => {
+    let response = null;
+    await postRequest('/requests/send', { username }, token)
+        .then((data) => (response = data))
+        .catch((err) => (response = err.response));
+    return response;
+};
+
+export const getMessages = async (token, receiver) => {
+    let response = null;
+    await getRequest('/messages/' + receiver, token)
+        .then((data) => (response = data))
+        .catch((err) => (response = err.response));
+    return response;
+};

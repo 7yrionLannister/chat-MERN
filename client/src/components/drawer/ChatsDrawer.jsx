@@ -7,10 +7,10 @@ import {
     Toolbar,
     Typography
 } from '@mui/material';
-import { FriendsList } from './FriendsList';
+import { DrawerList } from './drawerlist/DrawerList';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
-import { logout } from '../lib/redux/userSlice';
+import { logout } from '../../lib/redux/userSlice';
 
 export function ChatsDrawer({ user, width, onFriendClick }) {
     const dispatch = useDispatch();
@@ -66,7 +66,7 @@ export function ChatsDrawer({ user, width, onFriendClick }) {
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
             </Toolbar>
-            <FriendsList
+            <DrawerList
                 user={user}
                 onFriendClick={onFriendClick}
             />
