@@ -103,17 +103,17 @@ router.post('/unfriend/:unfriend', async (req, res) => {
     const currentUser = req.user.user_id;
     const userToUnfriend = req.params.unfriend;
     await userDB
-        .findByIdAndUpdate(userToUnfriend, { $pull: { friends: currentUser } })
+        .findByIdAndUpdate(currentUser, { $pull: { friends: userToUnfriend } })
         .then(async () => {
             await userDB
-                .findByIdAndUpdate(currentUser, {
-                    $pull: { friends: userToUnfriend }
+                .findByIdAndUpdate(userToUnfriend, {
+                    $pull: { friends: currentUser }
                 })
-                .then(() =>
+                .then((exFriend) =>
                     res
                         .status(200)
                         .send(
-                            `${currentUser} and ${userToUnfriend} are no longer friends`
+                            `You are no longer friends with ${exFriend.username}`
                         )
                 );
         })

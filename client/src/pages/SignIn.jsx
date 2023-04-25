@@ -16,24 +16,23 @@ export function SignIn() {
     const [response, setResponse] = useState(null);
     const dispatch = useDispatch();
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
 
-        let res = await loginApi(username, password);
-        if (res.status === 200) {
-            const { _id, username, photoURL, bio, token } = res.data;
-            const payload = {
-                _id,
-                username,
-                photoURL,
-                bio,
-                token
-            };
-            dispatch(login(payload));
-            localStorage.setItem('user', JSON.stringify(payload));
-        } else {
-            setResponse(res);
-        }
+        loginApi(username, password)
+            .then((res) => {
+                const { _id, username, photoURL, bio, token } = res.data;
+                const payload = {
+                    _id,
+                    username,
+                    photoURL,
+                    bio,
+                    token
+                };
+                dispatch(login(payload));
+                localStorage.setItem('user', JSON.stringify(payload));
+            })
+            .catch((err) => setResponse(err));
     };
 
     return (

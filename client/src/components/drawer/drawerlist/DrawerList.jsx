@@ -1,14 +1,16 @@
-import { IconButton, List, ListSubheader, Snackbar } from '@mui/material';
+import { Dialog, List, ListSubheader } from '@mui/material';
 import { useState } from 'react';
 import { SearchField } from '../../generic/SearchField';
 import { AllUsersListItems } from './AllUsersListItems';
 import { FriendsListItems } from './FriendsListItems';
-import { Close } from '@mui/icons-material';
+import { ResponseSnackbar } from '../../generic/ResponseScackbar';
+import { UserCard } from '../../card/UserCard';
 
 export function DrawerList({ user, onFriendClick }) {
     const [focused, setFocused] = useState(false);
     const [filter, setFilter] = useState('');
     const [actionResponse, setActionResponse] = useState(null);
+    const [userInfo, setUserInfo] = useState(null);
 
     return (
         <List>
@@ -26,6 +28,7 @@ export function DrawerList({ user, onFriendClick }) {
                     filter={filter}
                     user={user}
                     onFriendClick={onFriendClick}
+                    onShowUserInfo={setUserInfo}
                     onActionResponse={setActionResponse}
                 />
             ) : (
@@ -34,17 +37,21 @@ export function DrawerList({ user, onFriendClick }) {
                     onFriendClick={onFriendClick}
                 />
             )}
-            <Snackbar
-                open={actionResponse}
+            <ResponseSnackbar
+                response={actionResponse}
                 onClose={() => setActionResponse(null)}
-                autoHideDuration={5000}
-                message={actionResponse}
-                action={
-                    <IconButton onClick={() => setActionResponse(null)}>
-                        <Close />
-                    </IconButton>
-                }
             />
+            <Dialog
+                open={userInfo != null}
+                onClose={() => setUserInfo(null)}
+            >
+                {userInfo && (
+                    <UserCard
+                        user={userInfo}
+                        onActionResponse={setActionResponse}
+                    />
+                )}
+            </Dialog>
         </List>
     );
 }

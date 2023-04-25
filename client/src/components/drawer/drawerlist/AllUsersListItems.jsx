@@ -1,4 +1,4 @@
-import { Comment, Info, PersonAdd, PersonRemove } from '@mui/icons-material';
+import { Chat, PersonAdd, PersonRemove } from '@mui/icons-material';
 import {
     Avatar,
     Chip,
@@ -7,16 +7,18 @@ import {
     ListItem,
     ListItemAvatar,
     ListItemIcon,
-    ListItemText
+    ListItemText,
+    Tooltip
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getUsers, sendFriendRequest } from '../../../services/api';
+import { getUsers, sendFriendRequest, unfriend } from '../../../services/api';
 
 export function AllUsersListItems({
     filter,
     user,
     onFriendClick,
-    onActionResponse
+    onActionResponse,
+    onShowUserInfo
 }) {
     const [users, setUsers] = useState([]);
 
@@ -24,13 +26,13 @@ export function AllUsersListItems({
         getUsers(user.token).then((res) => setUsers(res.data));
     }, [user]);
 
-    const handleUnfriend = (friend) => {};
+    const handleUnfriend = (friend) =>
+        unfriend(user.token, friend._id).then((res) => onActionResponse(res));
 
-    const handleSendFriendRequest = (newFriend) => {
+    const handleSendFriendRequest = (newFriend) =>
         sendFriendRequest(user.token, newFriend.username).then((res) =>
-            onActionResponse(res.data)
+            onActionResponse(res)
         );
-    };
 
     return (
         <>
@@ -53,12 +55,17 @@ export function AllUsersListItems({
                                     disabled={!isFriend}
                                     onClick={() => onFriendClick(u)}
                                 >
-                                    <Comment />
+                                    <Chat />
                                 </IconButton>
                             }
                         >
-                            <ListItemAvatar onClick={() => alert('Show info')}>
-                                <Avatar src={u.photoURL} />
+                            <ListItemAvatar onClick={() => onShowUserInfo(u)}>
+                                <Tooltip
+                                    title='See user info'
+                                    arrow
+                                >
+                                    <Avatar src={u.photoURL} />
+                                </Tooltip>
                             </ListItemAvatar>
                             <ListItemText
                                 primary={u.username}
@@ -85,11 +92,6 @@ export function AllUsersListItems({
                                     }
                                     deleteIcon={<PersonRemove />}
                                 />
-                            </ListItemIcon>
-                            <ListItemIcon>
-                                <IconButton>
-                                    <Info />
-                                </IconButton>
                             </ListItemIcon>
                         </ListItem>
                         <Divider />

@@ -1,44 +1,36 @@
-import { getRequest, postRequest } from '../lib/axios';
+import { getRequest, postRequest, putRequest } from '../lib/axios';
 
-export const loginApi = async (username, password) => {
-    let response = null;
-    await postRequest('/users/login', { username, password })
-        .then((data) => (response = data))
-        .catch((err) => (response = err.response));
-    return response;
-};
+const getResponse = async (req) =>
+    await req.catch((err) => {
+        throw err.response;
+    });
 
-export const signupApi = async (username, password, photoURL, bio) => {
-    let response = null;
-    await postRequest('/users', { username, password, photoURL, bio })
-        .then((data) => (response = data))
-        .catch((err) => (response = err.response));
-    return response;
-};
+export const loginApi = (username, password) =>
+    getResponse(postRequest('/users/login', { username, password }));
 
-export const getUsers = async (token, user_id, username) => {
-    let response = null;
+export const signup = (username, password, photoURL, bio) =>
+    getResponse(postRequest('/users', { username, password, photoURL, bio }));
+
+export const updateProfile = (token, username, password, photoURL, bio) =>
+    getResponse(
+        putRequest('/users', { username, password, photoURL, bio }, token)
+    );
+
+export const unfriend = (token, friend) =>
+    getResponse(postRequest('/users/unfriend/' + friend, null, token));
+
+export const getUsers = (token, user_id, username) => {
     let query = '?';
     if (user_id) query += 'user_id=' + user_id;
     else if (username) query += 'username=' + username;
-    await getRequest('/users' + query, token)
-        .then((data) => (response = data))
-        .catch((err) => (response = err.response));
-    return response;
+    return getResponse(getRequest('/users' + query, token));
 };
 
-export const sendFriendRequest = async (token, username) => {
-    let response = null;
-    await postRequest('/requests/send', { username }, token)
-        .then((data) => (response = data))
-        .catch((err) => (response = err.response));
-    return response;
-};
+export const sendFriendRequest = (token, username) =>
+    getResponse(postRequest('/requests/send', { username }, token));
 
-export const getMessages = async (token, receiver) => {
-    let response = null;
-    await getRequest('/messages/' + receiver, token)
-        .then((data) => (response = data))
-        .catch((err) => (response = err.response));
-    return response;
-};
+export const respondToFriendRequest = (token, response, user_id) =>
+    getResponse(postRequest('/requests/respond', { response, user_id }, token));
+
+export const getMessages = (token, receiver) =>
+    getResponse(getRequest('/messages/' + receiver, token));

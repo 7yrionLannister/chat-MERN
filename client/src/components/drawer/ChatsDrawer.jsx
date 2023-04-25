@@ -1,6 +1,7 @@
 import {
     Avatar,
     Button,
+    Dialog,
     Drawer,
     Menu,
     MenuItem,
@@ -11,21 +12,17 @@ import { DrawerList } from './drawerlist/DrawerList';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { logout } from '../../lib/redux/userSlice';
+import { UserCard } from '../card/UserCard';
 
 export function ChatsDrawer({ user, width, onFriendClick }) {
     const dispatch = useDispatch();
-    const [openAvatarMenu, setOpenAvatarMenu] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [openProfile, setOpenProfile] = useState(false);
 
     const handleLogout = () => {
-        setOpenAvatarMenu(false);
+        setAnchorEl(null);
         localStorage.removeItem('user');
         dispatch(logout());
-    };
-
-    const handleUserAvatarClick = (event) => {
-        setAnchorEl(event.currentTarget);
-        setOpenAvatarMenu(true);
     };
 
     return (
@@ -49,22 +46,31 @@ export function ChatsDrawer({ user, width, onFriendClick }) {
                     width
                 }}
             >
-                <Button onClick={handleUserAvatarClick}>
+                <Button onClick={(e) => setAnchorEl(e.currentTarget)}>
                     <Avatar src={user.photoURL} />
                 </Button>
-                <Typography variant='h6'>{user.username}</Typography>
                 <Menu
                     anchorEl={anchorEl}
-                    open={openAvatarMenu}
-                    onClose={() => setOpenAvatarMenu(false)}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button'
-                    }}
+                    open={anchorEl != null}
+                    onClose={() => setAnchorEl(null)}
                 >
-                    <MenuItem>Profile</MenuItem>
-                    <MenuItem>My account</MenuItem>
+                    <MenuItem onClick={() => setOpenProfile(true)}>
+                        Profile
+                    </MenuItem>
+                    <Dialog
+                        open={openProfile}
+                        onClose={() => setOpenProfile(false)}
+                    >
+                        {openProfile && <UserCard user={user} />}
+                    </Dialog>
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
+                <Typography
+                    variant='h6'
+                    flexGrow={1}
+                >
+                    {user.username}
+                </Typography>
             </Toolbar>
             <DrawerList
                 user={user}

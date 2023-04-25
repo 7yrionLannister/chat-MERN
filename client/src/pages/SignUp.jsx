@@ -12,7 +12,7 @@ import { ValidatedField } from '../components/generic/ValidatedField';
 import { Password } from '../components/generic/Password';
 import { ResponseAlert } from '../components/generic/ResponseAlert';
 import { AuthenticationFormTitle } from '../components/generic/AuthenticationFormTitle';
-import { signupApi } from '../services/api';
+import { signup } from '../services/api';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../lib/redux/userSlice';
@@ -29,14 +29,13 @@ export function SignUp() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        let res = await signupApi(username, password, photoURL, bio);
-        if (res.status === 201) {
-            dispatch(login({ username, password }));
-            localStorage.setItem('user', JSON.stringify(res.data));
-            navigate('/');
-        } else {
-            setResponse(res);
-        }
+        signup(username, password, photoURL, bio)
+            .then((res) => {
+                dispatch(login({ username, password }));
+                localStorage.setItem('user', JSON.stringify(res.data));
+                navigate('/');
+            })
+            .catch((err) => setResponse(err));
     };
 
     return (
