@@ -34,3 +34,6 @@ export const respondToFriendRequest = (token, response, user_id) =>
 
 export const getMessages = (token, receiver) =>
     getResponse(getRequest('/messages/' + receiver, token));
+
+export const sendMessage = (token, receiver, message) =>
+    getResponse(postRequest('/messages/' + receiver, { message }, token));

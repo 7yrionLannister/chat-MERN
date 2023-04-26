@@ -16,6 +16,8 @@ export function DrawerList({ user, onFriendClick }) {
         <List>
             <ListSubheader>
                 <SearchField
+                    sx={{ mt: 0.5 }}
+                    size='small'
                     onFocus={() => setFocused(true)}
                     onBlur={(e) => setTimeout(() => setFocused(false), 150)} // set timeout so that click on search list is not mistaken for click on friends list
                     fullWidth

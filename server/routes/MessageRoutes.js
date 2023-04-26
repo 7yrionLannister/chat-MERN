@@ -8,6 +8,8 @@ router
     .post(async (req, res) => {
         const sender = req.user.user_id;
         const receiver = req.params.receiver;
+        const message = req.body.message;
+        if (!message) return res.status(400).send('Provide a message to send');
         const friend = await userDB
             .findOne({ _id: sender, friends: receiver })
             .exec();
@@ -22,7 +24,7 @@ router
             .create({
                 sender,
                 receiver,
-                message: req.body.message
+                message
             })
             .then(() => res.status(200).send('Message sent succesfully'))
             .catch(() => res.status(500).send('Could not send message'));

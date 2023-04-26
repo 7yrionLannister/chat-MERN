@@ -1,14 +1,35 @@
-import { AppBar, Avatar, Box, Toolbar, Typography } from '@mui/material';
+import {
+    AppBar,
+    Avatar,
+    Box,
+    IconButton,
+    TextField,
+    Toolbar,
+    Typography
+} from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getMessages } from '../services/api';
+import { getMessages, sendMessage } from '../services/api';
+import { Send } from '@mui/icons-material';
+import { MessageCard } from '../components/card/MessageCard';
 
-export function ChatView({ sender, receiver, drawerWidth }) {
+export function ChatView({ sender, receiver, drawerWidth, ...props }) {
     const styleRightToDrawer = {
-        maxWidth: `calc(100% - ${drawerWidth}px)`,
+        width: `calc(100% - ${drawerWidth}px)`,
         marginLeft: `${drawerWidth}px`
     };
 
     const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState('');
+
+    const handleSendMessage = () => {
+        sendMessage(sender.token, receiver._id, message).then(() => {
+            setMessages((msgs) => [
+                ...msgs,
+                { receiver: receiver._id, message }
+            ]);
+            setMessage('');
+        });
+    };
 
     useEffect(() => {
         getMessages(sender.token, receiver._id)
@@ -17,8 +38,11 @@ export function ChatView({ sender, receiver, drawerWidth }) {
     }, [sender, receiver]);
 
     return (
-        <Box sx={styleRightToDrawer}>
-            <AppBar position='sticky'>
+        <>
+            <AppBar
+                position='sticky'
+                sx={styleRightToDrawer}
+            >
                 <Toolbar>
                     <Avatar src={receiver.photoURL} />
                     <Typography
@@ -30,13 +54,53 @@ export function ChatView({ sender, receiver, drawerWidth }) {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            {messages.map((msg) => (
-                <Box>
-                    <h1>From: {msg.sender}</h1>
-                    <h1>To: {msg.receiver}</h1>
-                    <p>{msg.message}</p>
-                </Box>
-            ))}
-        </Box>
+            <Box
+                display='flex'
+                flexDirection='column'
+                sx={styleRightToDrawer}
+                {...props}
+            >
+                {messages.map((msg) => (
+                    <MessageCard
+                        key={msg._id}
+                        sender={
+                            msg.receiver === receiver._id ? sender : receiver
+                        }
+                        message={msg}
+                        alignSelf={
+                            msg.receiver === receiver._id
+                                ? 'flex-end'
+                                : 'flex-start'
+                        }
+                    />
+                ))}
+            </Box>
+            <Toolbar />
+            <Toolbar
+                fullWidth
+                sx={{
+                    position: 'fixed',
+                    bgcolor: 'primary.main',
+                    top: 'auto',
+                    bottom: 0,
+                    ...styleRightToDrawer
+                }}
+            >
+                <TextField
+                    multiline
+                    fullWidth
+                    size='small'
+                    color='secondary'
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    InputProps={{
+                        sx: { bgcolor: 'white' }
+                    }}
+                />
+                <IconButton onClick={handleSendMessage}>
+                    <Send />
+                </IconButton>
+            </Toolbar>
+        </>
     );
 }

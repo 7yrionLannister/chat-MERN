@@ -44,6 +44,9 @@ function signToken(user) {
     );
 }
 
+const testPasswordStregth = (password) =>
+    /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])(?=.{8,})/.test(password);
+
 const hashPassword = async (password) => {
     return await bcrypt.hash(password, 10);
 };
@@ -57,5 +60,6 @@ module.exports = {
     openMethod,
     hashPassword,
     signToken,
-    comparePasswords
+    comparePasswords,
+    testPasswordStregth
 };

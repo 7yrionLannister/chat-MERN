@@ -5,6 +5,10 @@ const userDB = require('../database/models/UserModel');
 router.post('/send', async (req, res) => {
     const userId = req.user.user_id;
     const potentialNewFriend = req.body.username;
+    if (!potentialNewFriend)
+        return res
+            .status(400)
+            .send('Provide "username" of the recipient of the friend request');
     await userDB
         .findOneAndUpdate(
             {
@@ -18,9 +22,15 @@ router.post('/send', async (req, res) => {
 });
 
 router.post('/respond', async (req, res) => {
-    const action = req.body.response;
     const currentUserId = req.user.user_id;
+    const action = req.body.response;
     const targetUser = req.body.user_id;
+    if (!(targetUser && action))
+        return res
+            .status(400)
+            .send(
+                'You must provide both the target user ("user_id") and the action to take ("response")'
+            );
     switch (action) {
         case 'accept':
             await userDB

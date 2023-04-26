@@ -17,6 +17,7 @@ export const Home = () => {
                     drawerWidth={drawerWidth}
                     sender={user}
                     receiver={currentFriend}
+                    p={2}
                 />
             )}
             <ChatsDrawer
