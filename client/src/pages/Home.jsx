@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-import { selectUser } from '../lib/redux/userSlice';
 import { useState } from 'react';
 import { ChatsDrawer } from '../components/drawer/ChatsDrawer';
 import { ChatView } from './ChatView';
@@ -7,7 +5,6 @@ import { ChatView } from './ChatView';
 const drawerWidth = 400;
 
 export const Home = () => {
-    const user = useSelector(selectUser);
     const [currentFriend, setCurrentFriend] = useState(null);
 
     return (
@@ -15,13 +12,11 @@ export const Home = () => {
             {currentFriend && (
                 <ChatView
                     drawerWidth={drawerWidth}
-                    sender={user}
                     receiver={currentFriend}
                     p={2}
                 />
             )}
             <ChatsDrawer
-                user={user}
                 width={drawerWidth}
                 onFriendClick={(friend) => setCurrentFriend(friend)}
             />

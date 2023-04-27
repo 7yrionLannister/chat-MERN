@@ -76,11 +76,12 @@ export function UserCard({ user }) {
             </CardContent>
             {isCurrentUser && (
                 <FriendRequestsDialog
-                    open={open}
+                    open={open && requests.length}
                     user={authUser}
                     onClose={() => setOpen(false)}
                     requests={requests}
                     setRequests={setRequests}
+                    setResponse={setActionResponse}
                 />
             )}
         </Card>

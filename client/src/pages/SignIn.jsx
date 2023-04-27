@@ -43,7 +43,6 @@ export function SignIn() {
             <ResponseAlert
                 response={response}
                 onClick={() => setResponse(null)}
-                errorMessage={response?.data}
             />
             <ValidatedField
                 margin='normal'

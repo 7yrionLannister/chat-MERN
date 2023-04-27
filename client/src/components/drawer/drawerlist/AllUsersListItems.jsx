@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getUsers, sendFriendRequest, unfriend } from '../../../services/api';
+import { removeFriendById } from '../../../lib/redux/friendsSlice';
+import { useDispatch } from 'react-redux';
 
 export function AllUsersListItems({
     filter,
@@ -21,13 +23,17 @@ export function AllUsersListItems({
     onShowUserInfo
 }) {
     const [users, setUsers] = useState([]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         getUsers(user.token).then((res) => setUsers(res.data));
     }, [user]);
 
     const handleUnfriend = (friend) =>
-        unfriend(user.token, friend._id).then((res) => onActionResponse(res));
+        unfriend(user.token, friend._id).then((res) => {
+            dispatch(removeFriendById(friend._id));
+            onActionResponse(res);
+        });
 
     const handleSendFriendRequest = (newFriend) =>
         sendFriendRequest(user.token, newFriend.username).then((res) =>
@@ -37,7 +43,7 @@ export function AllUsersListItems({
     return (
         <>
             {users.map((u) => {
-                const isFriend = u.friends.lastIndexOf(user._id) !== -1;
+                const isFriend = u.friends.indexOf(user._id) !== -1;
                 return (
                     <>
                         <ListItem

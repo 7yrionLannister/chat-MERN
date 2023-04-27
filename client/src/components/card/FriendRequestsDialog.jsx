@@ -11,26 +11,29 @@ import {
     ListItemText
 } from '@mui/material';
 import { respondToFriendRequest } from '../../services/api';
+import { useDispatch } from 'react-redux';
+import { addFriend } from '../../lib/redux/friendsSlice';
 
 export function FriendRequestsDialog({
     user,
-    open,
-    onClose,
     requests,
-    setRequests
+    setRequests,
+    setResponse,
+    ...props
 }) {
+    const dispatch = useDispatch();
+
     const handleRespond = (action, target) =>
-        respondToFriendRequest(user.token, action, target._id).then(() => {
+        respondToFriendRequest(user.token, action, target._id).then((res) => {
             const requestsCopy = [...requests];
             requestsCopy.splice(requestsCopy.indexOf(target), 1);
             setRequests(requestsCopy);
+            setResponse(res);
+            if (action === 'accept') dispatch(addFriend(target));
         });
 
     return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-        >
+        <Dialog {...props}>
             <DialogTitle>Friend requests</DialogTitle>
             <List>
                 {requests.map((request) => (

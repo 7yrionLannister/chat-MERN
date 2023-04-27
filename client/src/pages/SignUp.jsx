@@ -46,7 +46,6 @@ export function SignUp() {
             <ResponseAlert
                 response={response}
                 onClick={() => setResponse(null)}
-                errorMessage={response?.data}
             />
             <Grid
                 container

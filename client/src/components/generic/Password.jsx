@@ -3,7 +3,12 @@ import { IconButton } from '@mui/material';
 import { useState } from 'react';
 import { ValidatedField } from './ValidatedField';
 
-export function Password({ label = 'Password', ...props }) {
+export function Password({
+    label = 'Password',
+    isValid = (value) =>
+        /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])(?=.{8,})/.test(value),
+    ...props
+}) {
     const [visible, setVisible] = useState(false);
 
     return (
@@ -19,11 +24,7 @@ export function Password({ label = 'Password', ...props }) {
                 )
             }}
             errorMessage='Password must be at least 8 characters long, contain both uppercase and lowercase letters, digits and special characters'
-            isValid={(value) =>
-                /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])(?=.{8,})/.test(
-                    value
-                )
-            }
+            isValid={isValid}
         />
     );
 }

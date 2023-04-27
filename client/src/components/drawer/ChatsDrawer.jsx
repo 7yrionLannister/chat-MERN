@@ -9,12 +9,13 @@ import {
     Typography
 } from '@mui/material';
 import { DrawerList } from './drawerlist/DrawerList';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import { logout } from '../../lib/redux/userSlice';
+import { logout, selectUser } from '../../lib/redux/userSlice';
 import { UserCard } from '../card/UserCard';
 
-export function ChatsDrawer({ user, width, onFriendClick }) {
+export function ChatsDrawer({ width, onFriendClick }) {
+    const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
     const [openProfile, setOpenProfile] = useState(false);
@@ -61,7 +62,12 @@ export function ChatsDrawer({ user, width, onFriendClick }) {
                         open={openProfile}
                         onClose={() => setOpenProfile(false)}
                     >
-                        {openProfile && <UserCard user={user} />}
+                        {openProfile && (
+                            <UserCard
+                                user={user}
+                                onAcceptFriendRequest={() => {}}
+                            />
+                        )}
                     </Dialog>
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
@@ -72,10 +78,7 @@ export function ChatsDrawer({ user, width, onFriendClick }) {
                     {user.username}
                 </Typography>
             </Toolbar>
-            <DrawerList
-                user={user}
-                onFriendClick={onFriendClick}
-            />
+            <DrawerList onFriendClick={onFriendClick} />
         </Drawer>
     );
 }

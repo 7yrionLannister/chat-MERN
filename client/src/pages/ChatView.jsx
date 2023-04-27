@@ -11,8 +11,12 @@ import { useEffect, useState } from 'react';
 import { getMessages, sendMessage } from '../services/api';
 import { Send } from '@mui/icons-material';
 import { MessageCard } from '../components/card/MessageCard';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../lib/redux/userSlice';
 
-export function ChatView({ sender, receiver, drawerWidth, ...props }) {
+export function ChatView({ receiver, drawerWidth, ...props }) {
+    const sender = useSelector(selectUser);
+
     const styleRightToDrawer = {
         width: `calc(100% - ${drawerWidth}px)`,
         marginLeft: `${drawerWidth}px`
@@ -32,9 +36,13 @@ export function ChatView({ sender, receiver, drawerWidth, ...props }) {
     };
 
     useEffect(() => {
-        getMessages(sender.token, receiver._id)
-            .then((res) => setMessages(res.data))
-            .catch((err) => console.log(err));
+        const fetchMessages = () =>
+            getMessages(sender.token, receiver._id)
+                .then((res) => setMessages(res.data))
+                .catch((err) => console.log(err));
+        fetchMessages();
+        const timer = setInterval(fetchMessages, 30000); // fetch messages every 30 seconds
+        return () => clearInterval(timer);
     }, [sender, receiver]);
 
     return (

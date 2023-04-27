@@ -14,7 +14,7 @@ export function ResponseAlert({ response, errorMessage, ...props }) {
                 <AlertTitle>
                     {response?.status + ' ' + response?.statusText}
                 </AlertTitle>
-                {errorMessage}
+                {response?.data}
             </Alert>
         </Backdrop>
     );
