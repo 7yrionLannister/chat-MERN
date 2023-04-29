@@ -9,21 +9,21 @@ import {
     Typography
 } from '@mui/material';
 import { DrawerList } from './drawerlist/DrawerList';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useState } from 'react';
-import { logout, selectUser } from '../../lib/redux/userSlice';
+import { selectUser } from '../../lib/redux/userSlice';
 import { UserCard } from '../card/UserCard';
+import { useLogout } from '../../hooks/useLogout';
 
 export function ChatsDrawer({ width, onFriendClick }) {
     const user = useSelector(selectUser);
-    const dispatch = useDispatch();
+    const { logout } = useLogout();
     const [anchorEl, setAnchorEl] = useState(null);
     const [openProfile, setOpenProfile] = useState(false);
 
     const handleLogout = () => {
         setAnchorEl(null);
-        localStorage.removeItem('user');
-        dispatch(logout());
+        logout();
     };
 
     return (
@@ -62,12 +62,7 @@ export function ChatsDrawer({ width, onFriendClick }) {
                         open={openProfile}
                         onClose={() => setOpenProfile(false)}
                     >
-                        {openProfile && (
-                            <UserCard
-                                user={user}
-                                onAcceptFriendRequest={() => {}}
-                            />
-                        )}
+                        {openProfile && <UserCard user={user} />}
                     </Dialog>
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>

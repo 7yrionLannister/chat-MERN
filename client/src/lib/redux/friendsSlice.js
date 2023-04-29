@@ -14,7 +14,9 @@ export const friendsSlice = createSlice({
             );
             if (index > -1) state.splice(index, 1);
         },
-        clearFriends: () => []
+        clearFriends: (state) => {
+            state.splice(0, state.length);
+        }
     }
 });
 

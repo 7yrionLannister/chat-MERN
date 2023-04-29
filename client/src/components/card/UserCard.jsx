@@ -14,6 +14,7 @@ import { getUsers, sendFriendRequest } from '../../services/api';
 import { useEffect, useState } from 'react';
 import { ResponseSnackbar } from '../generic/ResponseScackbar';
 import { FriendRequestsDialog } from './FriendRequestsDialog';
+import { useLogout } from '../../hooks/useLogout';
 
 export function UserCard({ user }) {
     const authUser = useSelector(selectUser);
@@ -21,17 +22,20 @@ export function UserCard({ user }) {
     const [actionResponse, setActionResponse] = useState(null);
     const [requests, setRequests] = useState([]);
     const isCurrentUser = authUser._id === user._id;
+    const { logoutOnInvalidToken } = useLogout();
 
     useEffect(() => {
         if (isCurrentUser)
-            getUsers(authUser.token, authUser._id).then((resUser) =>
-                resUser.data.requests.forEach((req) =>
-                    getUsers(authUser.token, req).then((resReq) =>
-                        setRequests((rs) => [...rs, resReq.data])
+            getUsers(authUser.token, authUser._id)
+                .then((resUser) =>
+                    resUser.data.requests.forEach((req) =>
+                        getUsers(authUser.token, req).then((resReq) =>
+                            setRequests((rs) => [...rs, resReq.data])
+                        )
                     )
                 )
-            );
-    }, [isCurrentUser, authUser]);
+                .catch((err) => logoutOnInvalidToken(err));
+    }, [isCurrentUser, authUser, logoutOnInvalidToken]);
 
     const handleSendFriendRequest = () =>
         sendFriendRequest(authUser.token, user.username).then((res) =>

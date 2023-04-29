@@ -13,9 +13,11 @@ import { Send } from '@mui/icons-material';
 import { MessageCard } from '../components/card/MessageCard';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../lib/redux/userSlice';
+import { useLogout } from '../hooks/useLogout';
 
 export function ChatView({ receiver, drawerWidth, ...props }) {
     const sender = useSelector(selectUser);
+    const { logoutOnInvalidToken } = useLogout();
 
     const styleRightToDrawer = {
         width: `calc(100% - ${drawerWidth}px)`,
@@ -26,24 +28,26 @@ export function ChatView({ receiver, drawerWidth, ...props }) {
     const [message, setMessage] = useState('');
 
     const handleSendMessage = () => {
-        sendMessage(sender.token, receiver._id, message).then(() => {
-            setMessages((msgs) => [
-                ...msgs,
-                { receiver: receiver._id, message }
-            ]);
-            setMessage('');
-        });
+        sendMessage(sender.token, receiver._id, message)
+            .then(() => {
+                setMessages((msgs) => [
+                    ...msgs,
+                    { receiver: receiver._id, message }
+                ]);
+                setMessage('');
+            })
+            .catch((err) => logoutOnInvalidToken(err));
     };
 
     useEffect(() => {
         const fetchMessages = () =>
             getMessages(sender.token, receiver._id)
                 .then((res) => setMessages(res.data))
-                .catch((err) => console.log(err));
+                .catch((err) => logoutOnInvalidToken(err));
         fetchMessages();
-        const timer = setInterval(fetchMessages, 30000); // fetch messages every 30 seconds
+        const timer = setInterval(fetchMessages, 10000); // fetch messages every 10 seconds
         return () => clearInterval(timer);
-    }, [sender, receiver]);
+    }, [sender, receiver, logoutOnInvalidToken]);
 
     return (
         <>

@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { getUsers, sendFriendRequest, unfriend } from '../../../services/api';
 import { removeFriendById } from '../../../lib/redux/friendsSlice';
 import { useDispatch } from 'react-redux';
+import { useLogout } from '../../../hooks/useLogout';
 
 export function AllUsersListItems({
     filter,
@@ -24,10 +25,13 @@ export function AllUsersListItems({
 }) {
     const [users, setUsers] = useState([]);
     const dispatch = useDispatch();
+    const { logoutOnInvalidToken } = useLogout();
 
     useEffect(() => {
-        getUsers(user.token).then((res) => setUsers(res.data));
-    }, [user]);
+        getUsers(user.token)
+            .then((res) => setUsers(res.data))
+            .catch((err) => logoutOnInvalidToken(err));
+    }, [user, logoutOnInvalidToken]);
 
     const handleUnfriend = (friend) =>
         unfriend(user.token, friend._id).then((res) => {

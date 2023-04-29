@@ -13,6 +13,7 @@ import {
 import { respondToFriendRequest } from '../../services/api';
 import { useDispatch } from 'react-redux';
 import { addFriend } from '../../lib/redux/friendsSlice';
+import { useLogout } from '../../hooks/useLogout';
 
 export function FriendRequestsDialog({
     user,
@@ -22,15 +23,18 @@ export function FriendRequestsDialog({
     ...props
 }) {
     const dispatch = useDispatch();
+    const { logoutOnInvalidToken } = useLogout();
 
     const handleRespond = (action, target) =>
-        respondToFriendRequest(user.token, action, target._id).then((res) => {
-            const requestsCopy = [...requests];
-            requestsCopy.splice(requestsCopy.indexOf(target), 1);
-            setRequests(requestsCopy);
-            setResponse(res);
-            if (action === 'accept') dispatch(addFriend(target));
-        });
+        respondToFriendRequest(user.token, action, target._id)
+            .then((res) => {
+                const requestsCopy = [...requests];
+                requestsCopy.splice(requestsCopy.indexOf(target), 1);
+                setRequests(requestsCopy);
+                setResponse(res);
+                if (action === 'accept') dispatch(addFriend(target));
+            })
+            .catch((err) => logoutOnInvalidToken(err));
 
     return (
         <Dialog {...props}>

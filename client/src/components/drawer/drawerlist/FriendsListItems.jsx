@@ -14,21 +14,25 @@ import {
     clearFriends,
     selectFriends
 } from '../../../lib/redux/friendsSlice';
+import { useLogout } from '../../../hooks/useLogout';
 
 export function FriendsListItems({ user, onFriendClick }) {
     const friends = useSelector(selectFriends);
     const dispatch = useDispatch();
+    const { logoutOnInvalidToken } = useLogout();
 
     useEffect(() => {
         dispatch(clearFriends());
-        getUsers(user.token, user._id).then((responseUser) =>
-            responseUser.data.friends.forEach((friend) =>
-                getUsers(user.token, friend).then((responseFriend) =>
-                    dispatch(addFriend(responseFriend.data))
+        getUsers(user.token, user._id)
+            .then((responseUser) =>
+                responseUser.data.friends.forEach((friend) =>
+                    getUsers(user.token, friend).then((responseFriend) =>
+                        dispatch(addFriend(responseFriend.data))
+                    )
                 )
             )
-        );
-    }, [user, dispatch]);
+            .catch((err) => logoutOnInvalidToken(err));
+    }, [user, dispatch, logoutOnInvalidToken]);
 
     return (
         <>
