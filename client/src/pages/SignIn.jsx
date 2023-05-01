@@ -1,4 +1,4 @@
-import { Grid, Link, Button, FormControlLabel, Checkbox } from '@mui/material';
+import { Grid, Link, Button } from '@mui/material';
 import { Password } from '../components/generic/Password';
 import { Form } from '../components/generic/Form';
 import { ResponseAlert } from '../components/generic/ResponseAlert';
@@ -60,10 +60,6 @@ export function SignIn() {
                 required
                 onChange={(event) => setPassword(event.target.value)}
                 name='password'
-            />
-            <FormControlLabel
-                control={<Checkbox value='remember' />}
-                label='Remember me'
             />
             <Button
                 type='submit'

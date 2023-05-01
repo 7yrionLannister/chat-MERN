@@ -46,21 +46,18 @@ router
     })
     .put(async (req, res) => {
         const currentUsername = req.user.username;
-        const { username, password, photoURL, bio } = req.body;
-        if (password && !testPasswordStregth(password)) {
-            return res
-                .status(400)
-                .send(
-                    'Provide a strong password (uppercase and lowercase letters, digits and special characters)'
-                );
+        let { username, password, photoURL, bio } = req.body;
+        if (password && testPasswordStregth(password)) {
+            password = await hashPassword(password); // encrypt password before updating
+        } else {
+            password = undefined; // Ignore (don't update) if It is an empty string or a weak password
         }
-        let encryptedPwd = await hashPassword(password);
         await userDB
             .findOneAndUpdate(
                 { username: currentUsername },
                 {
                     username,
-                    password: encryptedPwd,
+                    password,
                     photoURL,
                     bio
                 },

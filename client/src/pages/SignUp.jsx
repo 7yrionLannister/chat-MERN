@@ -1,47 +1,59 @@
-import {
-    Box,
-    Button,
-    Checkbox,
-    FormControlLabel,
-    Grid,
-    Link,
-    TextField
-} from '@mui/material';
+import { Box, Button, Grid, Link, TextField } from '@mui/material';
 import { Form } from '../components/generic/Form';
 import { ValidatedField } from '../components/generic/ValidatedField';
 import { Password } from '../components/generic/Password';
 import { ResponseAlert } from '../components/generic/ResponseAlert';
 import { AuthenticationFormTitle } from '../components/generic/AuthenticationFormTitle';
-import { signup } from '../services/api';
+import { signup, updateProfile } from '../services/api';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../lib/redux/userSlice';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useLogout } from '../hooks/useLogout';
 
-export function SignUp() {
-    const [username, setUsername] = useState('');
+export function SignUp(props) {
+    const [username, setUsername] = useState(props.user?.username || '');
     const [password, setPassword] = useState('');
-    const [photoURL, setPhotoURL] = useState('');
-    const [bio, setBio] = useState('');
+    const [photoURL, setPhotoURL] = useState(props.user?.photoURL || '');
+    const [bio, setBio] = useState(props.user?.bio || '');
     const [response, setResponse] = useState(null);
     const dispatch = useDispatch();
+    const { logout } = useLogout();
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        signup(username, password, photoURL, bio)
-            .then((res) => {
-                dispatch(login({ username, password }));
-                localStorage.setItem('user', JSON.stringify(res.data));
-                navigate('/');
-            })
-            .catch((err) => setResponse(err));
+        if (props.user) {
+            updateProfile(
+                props.user.token,
+                username,
+                password,
+                photoURL,
+                bio
+            ).then(() => logout());
+        } else {
+            signup(username, password, photoURL, bio)
+                .then((res) => {
+                    dispatch(login(res.data));
+                    localStorage.setItem('user', JSON.stringify(res.data));
+                    navigate('/');
+                })
+                .catch((err) => setResponse(err));
+        }
     };
 
     return (
         <Form
             handleSubmit={handleSubmit}
-            title={<AuthenticationFormTitle title='Sign Up' />}
+            title={
+                <AuthenticationFormTitle
+                    title={
+                        props.user
+                            ? 'Update your profile information'
+                            : 'Sign Up'
+                    }
+                />
+            }
         >
             <ResponseAlert
                 response={response}
@@ -57,12 +69,13 @@ export function SignUp() {
                 >
                     <ValidatedField
                         margin='normal'
-                        required
                         label='Username'
+                        required
                         isValid={(value) => value.length >= 4}
                         errorMessage='At least 4 characters long'
                         onChange={(event) => setUsername(event.target.value)}
                         name='username'
+                        value={username}
                     />
                 </Grid>
                 <Grid
@@ -71,7 +84,7 @@ export function SignUp() {
                 >
                     <Password
                         margin='normal'
-                        required
+                        required={!props.user}
                         onChange={(event) => setPassword(event.target.value)}
                         name='password'
                     />
@@ -84,6 +97,7 @@ export function SignUp() {
                 label='Photo URL'
                 onChange={(event) => setPhotoURL(event.target.value)}
                 name='photoURL'
+                value={photoURL}
             />
             <Box
                 component='img'
@@ -98,10 +112,7 @@ export function SignUp() {
                 label='Bio'
                 onChange={(event) => setBio(event.target.value)}
                 name='bio'
-            />
-            <FormControlLabel
-                control={<Checkbox value='remember' />}
-                label='Remember me'
+                value={bio}
             />
             <Button
                 type='submit'
@@ -109,15 +120,17 @@ export function SignUp() {
                 variant='contained'
                 sx={{ mt: 3, mb: 2 }}
             >
-                Sign Up
+                {props.user ? 'Update information' : 'Sign Up'}
             </Button>
-            <Link
-                variant='body2'
-                component={RouterLink}
-                to='/'
-            >
-                Already have an account? Sign In
-            </Link>
+            {!props.user && (
+                <Link
+                    variant='body2'
+                    component={RouterLink}
+                    to='/'
+                >
+                    Already have an account? Sign In
+                </Link>
+            )}
         </Form>
     );
 }
